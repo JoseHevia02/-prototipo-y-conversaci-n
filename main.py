@@ -44,4 +44,4 @@ async def pagina_evaluar():
 
 @app.get("/postular")
 async def pagina_postular():
-    return FileResponse("postular.html")
+    return FileResponse("static/postular.html")

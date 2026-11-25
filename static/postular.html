@@ -1,68 +1,16 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HU-02 Postular a adopción</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 520px;
-      margin: 24px auto;
-      padding: 0 16px;
-      color: #111;
-      background: #fff;
-    }
-    h1 {
-      font-size: 26px;
-      margin-bottom: 16px;
-    }
-    fieldset {
-      border: 1px solid #999;
-      padding: 14px 16px;
-      margin-bottom: 18px;
-      background: #fafafa;
-    }
-    legend {
-      padding: 0 6px;
-      font-size: 14px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-    input {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px;
-      font-size: 14px;
-      border: 1px solid #888;
-    }
-    button {
-      width: 100%;
-      margin-top: 14px;
-      padding: 9px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      background: #efefef;
-      border: 1px solid #777;
-    }
-    button:hover {
-      background: #e2e2e2;
-    }
-    .estado-sesion {
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    pre {
-      background: #f2f2f2;
-      padding: 12px;
-      border: 1px solid #ccc;
-      overflow-x: auto;
-      font-size: 13px;
-    }
+    body { font-family: sans-serif; max-width: 520px; margin: 24px auto; padding: 0 12px; }
+    fieldset { margin-bottom: 16px; }
+    label { display: block; margin-top: 8px; }
+    input, button { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { margin-top: 12px; }
+    pre { background: #f2f2f2; padding: 12px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -70,72 +18,61 @@
 
   <fieldset>
     <legend>1. Iniciar sesión (vecino)</legend>
-    <label for="rut">RUT</label>
-    <input id="rut" type="text" value="11111111-1" />
-
-    <label for="clave">Clave</label>
-    <input id="clave" type="password" value="tenencia2026" />
-
-    <button id="btnLogin" type="button">Entrar</button>
-    <div id="infoSesion" class="estado-sesion">Sin sesión iniciada</div>
+    <label>RUT <input id="rut" value="11111111-1"></label>
+    <label>Clave <input id="clave" type="password"></label>
+    <button id="btnLogin">Entrar</button>
+    <p id="sesion">Sin sesión</p>
   </fieldset>
 
   <fieldset>
     <legend>2. Enviar postulación</legend>
-    <label for="animalId">ID del animal</label>
-    <input id="animalId" type="text" value="SIM-000002" />
-
-    <button id="btnPostular" type="button">Enviar postulación</button>
+    <label>ID del animal <input id="animalId" value="SIM-000002"></label>
+    <button id="btnPostular">Enviar postulación</button>
   </fieldset>
 
   <h2>Respuesta</h2>
-  <pre id="salida">Esperando acción...</pre>
+  <pre id="resultado">-</pre>
 
   <script>
+    // El token queda solo en memoria: se pierde al cerrar la pestaña.
     let token = "";
-    const salida = document.getElementById("salida");
-    const infoSesion = document.getElementById("infoSesion");
 
-    document.getElementById("btnLogin").addEventListener("click", async () => {
-      const rut = document.getElementById("rut").value.trim();
-      const clave = document.getElementById("clave").value;
+    function mostrar(codigo, datos) {
+      // textContent escribe texto plano, asi no se ejecuta HTML que venga en la respuesta.
+      document.getElementById("resultado").textContent =
+        "HTTP " + codigo + "\n" + JSON.stringify(datos, null, 2);
+    }
 
-      try {
-        const res = await fetch("/api/adopciones/sesiones", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rut, clave })
-        });
-        const data = await res.json();
-        if (res.ok && data.token) {
-          token = data.token;
-          infoSesion.textContent = `${data.nombre || rut} (${data.perfil || "usuario"})`;
-        } else {
-          token = "";
-          infoSesion.textContent = "Error al iniciar sesión";
-        }
-        salida.textContent = `HTTP ${res.status}\n${JSON.stringify(data, null, 2)}`;
-      } catch (err) {
-        salida.textContent = `Error de red: ${err.message}`;
+    document.getElementById("btnLogin").addEventListener("click", async function () {
+      const respuesta = await fetch("/api/adopciones/sesiones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rut: document.getElementById("rut").value,
+          clave: document.getElementById("clave").value
+        })
+      });
+      const datos = await respuesta.json();
+      if (respuesta.status === 201 || respuesta.status === 200) {
+        token = datos.token;
+        document.getElementById("sesion").textContent = datos.nombre + " (" + datos.perfil + ")";
+      } else {
+        mostrar(respuesta.status, datos);
       }
     });
 
-    document.getElementById("btnPostular").addEventListener("click", async () => {
-      const animalId = document.getElementById("animalId").value.trim();
-      const headers = { "Content-Type": "application/json" };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-
-      try {
-        const res = await fetch("/api/adopciones/postulaciones", {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ animalId })
-        });
-        const data = await res.json();
-        salida.textContent = `HTTP ${res.status}\n${JSON.stringify(data, null, 2)}`;
-      } catch (err) {
-        salida.textContent = `Error de red: ${err.message}`;
+    document.getElementById("btnPostular").addEventListener("click", async function () {
+      const cuerpo = { animalId: document.getElementById("animalId").value };
+      const cabeceras = { "Content-Type": "application/json" };
+      if (token) {
+        cabeceras["Authorization"] = "Bearer " + token;
       }
+      const respuesta = await fetch("/api/adopciones/postulaciones", {
+        method: "POST",
+        headers: cabeceras,
+        body: JSON.stringify(cuerpo)
+      });
+      mostrar(respuesta.status, await respuesta.json());
     });
   </script>
 </body>
