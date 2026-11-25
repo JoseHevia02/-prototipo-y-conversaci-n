@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app import evaluar, login
+from app import evaluar, login , animales , postulaciones
 from app.auth import requiere_perfil
 from app.errores import manejar_http, manejar_validacion
 from app.semilla import restablecer_semilla
@@ -25,6 +25,8 @@ app.add_exception_handler(RequestValidationError, manejar_validacion)
 
 app.include_router(login.router)
 app.include_router(evaluar.router)
+app.include_router(animales.router)
+app.include_router(postulaciones.router)
 
 
 @app.get("/api/adopciones/salud")
@@ -40,3 +42,7 @@ async def prueba_funcionario(usuario=Depends(requiere_perfil(["funcionario"]))):
 @app.get("/evaluar")
 async def pagina_evaluar():
     return FileResponse("static/evaluar.html")
+
+@app.get("/consultas")
+async def pagina_consultas():
+    return FileResponse("static/consultas.html")
