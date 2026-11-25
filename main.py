@@ -40,3 +40,8 @@ async def prueba_funcionario(usuario=Depends(requiere_perfil(["funcionario"]))):
 @app.get("/evaluar")
 async def pagina_evaluar():
     return FileResponse("static/evaluar.html")
+
+
+@app.get("/postular")
+async def pagina_postular():
+    return FileResponse("postular.html")
