@@ -1,0 +1,28 @@
+{
+  "seccion": "IEI-C1",
+  "modulo": 3,
+  "grupo": "G05",
+  "prototipo": "POR-COMPLETAR: URL de Render",
+  "repositorio": "https://github.com/JoseHevia02/-prototipo-y-conversaci-n",
+  "taiga": "https://tree.taiga.io/project/realangelomagno-sistema-municipal-de-tenencia-responsable-de-mascotas",
+  "integrantes": [
+    { "nombre": "Juan Apalmo", "github": "apalmo98", "taiga": "apalmo", "rol": "Arquitecto de software" },
+    { "nombre": "José Hevia", "github": "JoseHevia02", "taiga": "Jose.hevia", "rol": "POR-COMPLETAR" },
+    { "nombre": "Angelo Torres", "github": "POR-COMPLETAR", "taiga": "realangelomagno", "rol": "POR-COMPLETAR" },
+    { "nombre": "Alejandro Córdova", "github": "POR-COMPLETAR", "taiga": "AlejandroCordova", "rol": "POR-COMPLETAR" }
+  ],
+  "historias": [
+    {
+      "id": "HU-05",
+      "titulo": "Evaluar una postulación",
+      "responsable": "apalmo98",
+      "verificacion": {
+        "metodo": "PUT",
+        "ruta": "/api/adopciones/postulaciones/POST-SEED-002/estado",
+        "perfil": "funcionario",
+        "cuerpo": { "estado": "aprobada" },
+        "esperado": 200
+      }
+    }
+  ]
+}
