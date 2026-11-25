@@ -9,7 +9,7 @@
     { "nombre": "Juan Apalmo", "github": "apalmo98", "taiga": "apalmo", "rol": "Arquitecto de software" },
     { "nombre": "José Hevia", "github": "JoseHevia02", "taiga": "Jose.hevia", "rol": "POR-COMPLETAR" },
     { "nombre": "Angelo Torres", "github": "POR-COMPLETAR", "taiga": "realangelomagno", "rol": "POR-COMPLETAR" },
-    { "nombre": "Alejandro Córdova", "github": "POR-COMPLETAR", "taiga": "AlejandroCordova", "rol": "POR-COMPLETAR" }
+    { "nombre": "Alejandro Córdova", "github": "AlejandroW232", "taiga": "AlejandroCordova", "rol": "POR-COMPLETAR" }
   ],
   "historias": [
     {
