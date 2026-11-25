@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HU-05 Evaluar una postulación</title>
+  <style>
+    body { font-family: sans-serif; max-width: 520px; margin: 24px auto; padding: 0 12px; }
+    fieldset { margin-bottom: 16px; }
+    label { display: block; margin-top: 8px; }
+    input, select, button { width: 100%; padding: 8px; box-sizing: border-box; }
+    button { margin-top: 12px; }
+    pre { background: #f2f2f2; padding: 12px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>HU-05 Evaluar una postulación</h1>
+
+  <fieldset>
+    <legend>1. Iniciar sesión (funcionario)</legend>
+    <label>RUT <input id="rut" value="17777777-3"></label>
+    <label>Clave <input id="clave" type="password"></label>
+    <button id="btnLogin">Entrar</button>
+    <p id="sesion">Sin sesión</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>2. Cambiar el estado</legend>
+    <label>ID de la postulación <input id="postulacionId" value="POST-SEED-002"></label>
+    <label>Nuevo estado
+      <select id="estado">
+        <option>en evaluación</option>
+        <option>aprobada</option>
+        <option>rechazada</option>
+      </select>
+    </label>
+    <label>Motivo (obligatorio al rechazar) <input id="motivo" maxlength="300"></label>
+    <button id="btnEvaluar">Guardar evaluación</button>
+  </fieldset>
+
+  <h2>Respuesta</h2>
+  <pre id="resultado">-</pre>
+
+  <script>
+    // El token queda solo en memoria: se pierde al cerrar la pestaña.
+    let token = "";
+
+    function mostrar(codigo, datos) {
+      // textContent escribe texto plano, asi no se ejecuta HTML que venga en la respuesta.
+      document.getElementById("resultado").textContent =
+        "HTTP " + codigo + "\n" + JSON.stringify(datos, null, 2);
+    }
+
+    document.getElementById("btnLogin").addEventListener("click", async function () {
+      const respuesta = await fetch("/api/adopciones/sesiones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rut: document.getElementById("rut").value,
+          clave: document.getElementById("clave").value
+        })
+      });
+      const datos = await respuesta.json();
+      if (respuesta.status === 201) {
+        token = datos.token;
+        document.getElementById("sesion").textContent = datos.nombre + " (" + datos.perfil + ")";
+      } else {
+        mostrar(respuesta.status, datos);
+      }
+    });
+
+    document.getElementById("btnEvaluar").addEventListener("click", async function () {
+      const id = document.getElementById("postulacionId").value;
+      const cuerpo = { estado: document.getElementById("estado").value };
+      const motivo = document.getElementById("motivo").value;
+      if (motivo) {
+        cuerpo.motivo = motivo;
+      }
+      const respuesta = await fetch(
+        "/api/adopciones/postulaciones/" + encodeURIComponent(id) + "/estado",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify(cuerpo)
+        }
+      );
+      mostrar(respuesta.status, await respuesta.json());
+    });
+  </script>
+</body>
+</html>
