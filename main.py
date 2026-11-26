@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app import evaluar, login , animales , postulaciones
+from app import evaluar, login, postular, animales, postulaciones
 from app.auth import requiere_perfil
 from app.errores import manejar_http, manejar_validacion
 from app.semilla import restablecer_semilla
@@ -13,7 +13,6 @@ from app.semilla import restablecer_semilla
 
 @asynccontextmanager
 async def al_iniciar(app):
-    # Cada vez que arranca el servicio, los datos de partida vuelven a su estado inicial.
     restablecer_semilla()
     yield
 
@@ -25,6 +24,7 @@ app.add_exception_handler(RequestValidationError, manejar_validacion)
 
 app.include_router(login.router)
 app.include_router(evaluar.router)
+app.include_router(postular.router)
 app.include_router(animales.router)
 app.include_router(postulaciones.router)
 
@@ -42,6 +42,10 @@ async def prueba_funcionario(usuario=Depends(requiere_perfil(["funcionario"]))):
 @app.get("/evaluar")
 async def pagina_evaluar():
     return FileResponse("static/evaluar.html")
+
+@app.get("/postular")
+async def pagina_postular():
+    return FileResponse("static/postular.html")
 
 @app.get("/consultas")
 async def pagina_consultas():
