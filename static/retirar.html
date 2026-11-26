@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Retirar postulación</title>
+</head>
+<body>
+    <p><a href="/">Inicio</a></p>
+    <h1>Retirar postulación (HU-04)</h1>
+
+    <label>RUT: <input id="rut" value="11111111-1"></label><br><br>
+    <label>Clave: <input id="clave" type="password" value="tenencia2026"></label><br><br>
+    <label>ID postulación: <input id="id" placeholder="POST-SEED-001"></label><br><br>
+    <button onclick="enviar()">Retirar</button>
+
+    <pre id="res"></pre>
+
+    <script>
+        async function enviar() {
+            const rut = document.getElementById("rut").value.trim();
+            const clave = document.getElementById("clave").value;
+            const id = document.getElementById("id").value.trim();
+
+            const rLogin = await fetch("/api/adopciones/sesiones", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rut, clave })
+            });
+            const dLogin = await rLogin.json();
+            const token = dLogin.token || dLogin.access_token || "";
+
+            const headers = { "Content-Type": "application/json" };
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            const r = await fetch("/api/adopciones/postulaciones/" + encodeURIComponent(id) + "/retirar", {
+                method: "POST",
+                headers
+            });
+            const d = await r.json();
+            document.getElementById("res").textContent = JSON.stringify({ status: r.status, data: d }, null, 2);
+        }
+    </script>
+</body>
+</html>

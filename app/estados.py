@@ -1,5 +1,4 @@
-# Maquina de estados de una postulacion.
-# La usan HU-05 (evaluar) y HU-06 (entrega): es la unica fuente de reglas.
+
 
 RECIBIDA = "recibida"
 EN_EVALUACION = "en evaluación"

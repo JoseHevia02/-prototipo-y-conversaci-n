@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app import evaluar, login, postular, animales, postulaciones
+from app import evaluar, login, postular, animales, postulaciones, retirar, registrar
 from app.errores import manejar_http, manejar_validacion
 from app.semilla import restablecer_semilla
 
@@ -26,6 +26,8 @@ app.include_router(evaluar.router)
 app.include_router(postular.router)
 app.include_router(animales.router)
 app.include_router(postulaciones.router)
+app.include_router(retirar.router)
+app.include_router(registrar.router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -50,6 +52,8 @@ async def inicio():
         <a href="/postular">Postular a adopción<span>Crear postulación (HU-02)</span></a>
         <a href="/evaluar">Evaluar postulación<span>Cambiar estado de postulación (HU-05)</span></a>
         <a href="/consultas">Consultar<span>Ver animales disponibles y mis postulaciones (HU-01 / HU-03)</span></a>
+        <a href="/docs#/default/retirar_postulacion_api_adopciones_postulaciones__postulacion_id__retirar_post">Retirar postulación<span>Retirar postulación propia (HU-04 — probar en /docs)</span></a>
+        <a href="/docs#/default/registrar_devolucion_api_adopciones_postulaciones__postulacion_id__devolucion_post">Registrar devolución<span>Devolver adopción concretada (HU-06 — probar en /docs)</span></a>
         <a href="/docs">Documentación API<span>Swagger UI (/docs)</span></a>
     </body>
     </html>

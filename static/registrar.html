@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar devolución</title>
+</head>
+<body>
+    <p><a href="/">Inicio</a></p>
+    <h1>Registrar devolución (HU-06)</h1>
+
+    <label>RUT: <input id="rut" value="17777777-3"></label><br><br>
+    <label>Clave: <input id="clave" type="password" value="tenencia2026"></label><br><br>
+    <label>ID postulación: <input id="id" placeholder="POST-SEED-002"></label><br><br>
+    <label>Motivo: <input id="motivo" placeholder="Motivo"></label><br><br>
+    <button onclick="enviar()">Registrar devolución</button>
+
+    <pre id="res"></pre>
+
+    <script>
+        async function enviar() {
+            const rut = document.getElementById("rut").value.trim();
+            const clave = document.getElementById("clave").value;
+            const id = document.getElementById("id").value.trim();
+            const motivo = document.getElementById("motivo").value.trim();
+
+            const rLogin = await fetch("/api/adopciones/sesiones", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rut, clave })
+            });
+            const dLogin = await rLogin.json();
+            const token = dLogin.token || dLogin.access_token || "";
+
+            const headers = { "Content-Type": "application/json" };
+            if (token) headers["Authorization"] = "Bearer " + token;
+
+            const r = await fetch("/api/adopciones/postulaciones/" + encodeURIComponent(id) + "/devolucion", {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ motivo })
+            });
+            const d = await r.json();
+            document.getElementById("res").textContent = JSON.stringify({ status: r.status, data: d }, null, 2);
+        }
+    </script>
+</body>
+</html>
