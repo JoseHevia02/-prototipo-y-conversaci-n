@@ -38,7 +38,11 @@ async def postular(
     rut = usuario.get("rut")
 
     animal = await buscar_animal(datos.animalId, headers=headers)
-    if animal.get("estado") == "fallecido" or animal.get("fallecido"):
+    if (
+        animal.get("estado") == "fallecido"
+        or animal.get("fallecido")
+        or str(animal.get("tutorRut") or "").strip()
+    ):
         raise HTTPException(status_code=409, detail="Animal no disponible")
 
     if rut:
