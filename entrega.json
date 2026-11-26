@@ -9,9 +9,21 @@
     { "nombre": "Juan Apalmo", "github": "apalmo98", "taiga": "apalmo", "rol": "Arquitecto de software" },
     { "nombre": "José Hevia", "github": "JoseHevia02", "taiga": "Jose.hevia", "rol": "back" },
     { "nombre": "Angelo Torres", "github": "POR-COMPLETAR", "taiga": "realangelomagno", "rol": "POR-COMPLETAR" },
-    { "nombre": "Alejandro Córdova", "github": "AlejandroW232", "taiga": "AlejandroCordova", "rol": "POR-COMPLETAR" }
+    { "nombre": "Alejandro Córdova", "github": "AlejandroW232", "taiga": "AlejandroCordova", "rol": "UX" }
   ],
   "historias": [
+    {
+      "id": "HU-01",
+      "titulo": "Poder ver los animales disponibles para adopción",
+      "responsable": "AlejandroW232",
+      "verificacion": {
+        "metodo": "GET",
+        "ruta": "/api/adopciones/animales",
+        "perfil": "vecino",
+        "cuerpo": null,
+        "esperado": 200
+    }
+  },
     {
       "id": "HU-02",
       "titulo": "Postular a la adopción de un animal",
@@ -23,7 +35,19 @@
         "cuerpo": { "animalId": "SIM-000002" },
         "esperado": 201
       }
-    },
+    },  
+      {
+        "id": "HU-03",
+        "titulo": "Ver mis postulaciones",
+        "responsable": "AlejandroW232",
+        "verificacion": {
+          "metodo": "GET",
+          "ruta": "/api/adopciones/postulaciones",
+          "perfil": "vecino",
+          "cuerpo": null,
+          "esperado": 200
+      }
+  },
     {
       "id": "HU-05",
       "titulo": "Evaluar una postulación",
