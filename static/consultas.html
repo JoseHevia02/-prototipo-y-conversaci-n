@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mis consultas - Adopciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 12px;
+        }
+
+        h1,
+        h2 {
+            color: #1f3a5f;
+        }
+
+        section {
+            border: 1px solid #ccc;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-top: 8px;
+        }
+
+        input {
+            padding: 6px;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin-top: 8px;
+            margin-right: 6px;
+            cursor: pointer;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Mis consultas</h1>
+
+    <section>
+        <h2>1. Iniciar sesión</h2>
+        <label for="rut">RUT (ej: 12345678-9)</label>
+        <input type="text" id="rut">
+        <label for="clave">Clave</label>
+        <input type="password" id="clave">
+        <br>
+        <button onclick="iniciarSesion()">Iniciar sesión</button>
+        <p id="estado">Sin sesión iniciada.</p>
+    </section>
+
+    <section>
+        <h2>2. Animales disponibles (HU-01)</h2>
+        <label for="especie">Especie (opcional)</label>
+        <input type="text" id="especie">
+        <button onclick="consultarAnimales()">Consultar animales</button>
+    </section>
+
+    <section>
+        <h2>3. Postulaciones (HU-03)</h2>
+        <button onclick="consultarPostulaciones()">Ver mis postulaciones</button>
+        <br>
+        <label for="idPostulacion">ID de una postulación</label>
+        <input type="text" id="idPostulacion">
+        <button onclick="consultarUnaPostulacion()">Buscar por ID</button>
+    </section>
+
+    <h2>Resultado</h2>
+    <pre id="resultado">Aún no hay resultados.</pre>
+
+    <script>
+        var token = "";
+
+        function mostrar(titulo, datos) {
+            document.getElementById("resultado").textContent =
+                titulo + "\n" + JSON.stringify(datos, null, 2);
+        }
+
+        async function iniciarSesion() {
+            var rut = document.getElementById("rut").value;
+            var clave = document.getElementById("clave").value;
+
+            try {
+                var respuesta = await fetch("/api/adopciones/sesiones", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ rut: rut, clave: clave })
+                });
+                var datos = await respuesta.json();
+
+                if (respuesta.status === 201) {
+                    token = datos.token;
+                    document.getElementById("estado").textContent = "Sesión iniciada.";
+                } else {
+                    token = "";
+                    document.getElementById("estado").textContent = "No se pudo iniciar sesión.";
+                }
+                mostrar("Login - HTTP " + respuesta.status, datos);
+            } catch (error) {
+                mostrar("Error de conexión", { mensaje: "No se pudo conectar con el servidor" });
+            }
+        }
+
+        async function consultar(url) {
+            if (token === "") {
+                mostrar("Aviso", { mensaje: "Primero inicia sesión" });
+                return;
+            }
+            try {
+                var respuesta = await fetch(url, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                var datos = await respuesta.json();
+                mostrar("GET " + url + " - HTTP " + respuesta.status, datos);
+            } catch (error) {
+                mostrar("Error de conexión", { mensaje: "No se pudo conectar con el servidor" });
+            }
+        }
+
+        function consultarAnimales() {
+            var especie = document.getElementById("especie").value;
+            var url = "/api/adopciones/animales?page=1&limit=20";
+            if (especie !== "") {
+                url = url + "&especie=" + encodeURIComponent(especie);
+            }
+            consultar(url);
+        }
+
+        function consultarPostulaciones() {
+            consultar("/api/adopciones/postulaciones?page=1&limit=20");
+        }
+
+        function consultarUnaPostulacion() {
+            var id = document.getElementById("idPostulacion").value;
+            consultar("/api/adopciones/postulaciones/" + encodeURIComponent(id));
+        }
+    </script>
+</body>
+
+</html>
